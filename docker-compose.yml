@@ -1,0 +1,20 @@
+services:
+  # May need to run:
+  # sudo xhost +local:docker
+  lunar-lander-actor-critic:
+    build:
+      context: ./
+      dockerfile: ./docker/Dockerfile
+    volumes:
+    - ./src:/app
+    - /tmp/.X11-unix:/tmp/.X11-unix
+    environment:
+    - DISPLAY=$DISPLAY
+    image: lunar-lander-actor-critic
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            count: all
+            capabilities: [gpu]
