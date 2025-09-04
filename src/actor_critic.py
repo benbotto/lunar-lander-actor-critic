@@ -61,7 +61,7 @@ class ActorCritic(tf.keras.Model):
   """
   def compute_loss(self, action_probs, values, returns):
     actor_loss = -tf.reduce_sum(tf.math.log(action_probs) * (returns - values))
-    critic_loss = self.critic_loss_func(values, returns)
+    critic_loss = self.critic_loss_func(returns, values)
 
     return actor_loss + critic_loss
 
