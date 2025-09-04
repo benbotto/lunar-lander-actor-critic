@@ -3,6 +3,7 @@ import numpy as np
 import tensorflow as tf
 from actor_critic import ActorCritic
 from collections import deque
+from PIL import Image
 
 # Number of hidden, shared neurons in the neural net.
 NUM_HIDDEN_UNITS = 512
@@ -17,6 +18,12 @@ ALPHA = 0.01
 
 # For preventing division by zero.
 EPSILON = np.finfo(np.float32).eps.item()
+
+# Render episodes during training every N episodes.
+RENDER_FREQ = 1000
+
+# When rendering an episode to a GIF, every Nth screen is rendered.
+RENDER_SCREEN_FREQ = 4
 
 # Gym environment, and the "success" criteria: average episode reward over
 # some number of episodes.
@@ -153,16 +160,52 @@ def train_step(env, model, initial_state):
   return tf.reduce_sum(rewards)
 
 """
-Entrypoint.  Train the model.
+Run an episode and render it to an animated GIF.
+"""
+def render_episode(env, model, image_file):
+  state, _ = env.reset()
+  images = [Image.fromarray(env.render())]
+  total_reward = 0
+  episode_over = False
+  episode_num = 0
+
+  while not episode_over:
+    episode_num += 1
+
+    action_logits, _ = model(tf.expand_dims(state, 0))
+    action = np.argmax(np.squeeze(action_logits))
+    state, reward, done, truncated, _ = env.step(action)
+
+    total_reward += reward
+    episode_over = done or truncated
+
+    if episode_num % RENDER_SCREEN_FREQ == 0:
+      images.append(Image.fromarray(env.render()))
+
+  # Save to an animated GIF that loops with 1ms between frames.
+  images[0].save(
+    image_file,
+    save_all=True,
+    append_images=images[1:],
+    loop=0,
+    duration=1
+  )
+
+  return total_reward
+
+"""
+Entrypoint.  Train the model, and render the result.
 """
 def main():
   env = gym.make(GYM_ENV)
+  render_env = gym.make(GYM_ENV, render_mode="rgb_array")
   model = ActorCritic(env.action_space.n, NUM_HIDDEN_UNITS, ALPHA)
   episode_rewards = deque(maxlen=MEAN_REWARD_EPISODES)
   episode_num = 0
   mean_reward = 0
+  done = False
 
-  while mean_reward < MEAN_REWARD_TARGET:
+  while not done:
     episode_num += 1
     state, _ = env.reset()
 
@@ -170,8 +213,16 @@ def main():
     episode_rewards.append(episode_reward)
     mean_reward = np.mean(episode_rewards)
 
-    if episode_num % 100 == 0 or mean_reward >= MEAN_REWARD_TARGET:
+    done = mean_reward >= MEAN_REWARD_TARGET
+
+    if episode_num % MEAN_REWARD_EPISODES == 0 or done:
       print(f"Episode {episode_num} mean reward: {mean_reward}")
+
+    # Every once in a while, render an animated gif of an episode.
+    if episode_num % RENDER_FREQ == 0 or done:
+      image_file = f"../data/{GYM_ENV}-{episode_num}.gif"
+      rendered_episode_reward = render_episode(render_env, model, image_file)
+      print(f"Rendered episode {episode_num} to {image_file}. Reward: {rendered_episode_reward}")
 
 if __name__ == "__main__":
   main()
