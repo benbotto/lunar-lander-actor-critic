@@ -5,7 +5,8 @@ from actor_critic import ActorCritic
 from collections import deque
 from PIL import Image
 
-# Number of hidden, shared neurons in the neural net.
+# Number of hidden, shared neurons in the neural net.  This can be as low as
+# 32, but is more stable with more neurons without much performance difference.
 NUM_HIDDEN_UNITS = 512
 
 # Usually denoted γ, the discount factor determines how much to favor future
