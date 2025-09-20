@@ -139,7 +139,7 @@ the actual normalized return ($g$) was 0.05: the advantage ($a$) is negative
 (-0.7). Subsequently, all of the action probabilities for $\pi(s)$ will be
 increased, and those nearest 0 will be increased the most because they will have
 the steepest gradients. Next time state $s$ is encountered, the Actor will be
-more likely to choose a different action.
+more likely to propose a different action.
 * Conversely, if a value prediction is too low, the return was higher than
 expected: the policy was better than expected, and the advantage is positive.
 All action probabilities will be reduced, but those nearest 0 will be reduced
