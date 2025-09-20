@@ -168,10 +168,10 @@ def render_episode(env, model, image_file):
   images = [Image.fromarray(env.render())]
   total_reward = 0
   episode_over = False
-  episode_num = 0
+  step_num = 0
 
   while not episode_over:
-    episode_num += 1
+    step_num += 1
 
     action_logits, _ = model(tf.expand_dims(state, 0))
     action = np.argmax(np.squeeze(action_logits))
@@ -180,7 +180,7 @@ def render_episode(env, model, image_file):
     total_reward += reward
     episode_over = done or truncated
 
-    if episode_num % RENDER_SCREEN_FREQ == 0:
+    if step_num % RENDER_SCREEN_FREQ == 0:
       images.append(Image.fromarray(env.render()))
 
   # Save to an animated GIF that loops with 1ms between frames.
