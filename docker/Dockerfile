@@ -7,7 +7,7 @@ FROM tensorflow/tensorflow:2.17.0-gpu
 ENV TF_CPP_MIN_LOG_LEVEL=3
 
 RUN pip install swig \
-  && pip install "gymnasium[classic-control,box2d]==1.2.0" Pillow
+  && pip install "gymnasium[classic-control,box2d]==1.2.0" "Pillow==11.3.0"
 
 WORKDIR /app
 
