@@ -120,7 +120,7 @@ that sums to 1.
 Some properties of natural log:
 
 * $-ln(x)$ is asymptotic: $\lim\limits_{x\to0}-ln(x)=\infty$.
-* $-ln(x)$ intercepts the y-axis when $x=1$.
+* $-ln(x)$ intercepts the x-axis when $x=1$.
 * $\frac{d}{dx}-ln(x)*c=-\frac{c}{x}$. (This represents the gradients.)
 
 The Actor loss is thus:
