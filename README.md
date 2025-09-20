@@ -15,7 +15,7 @@ should be installed.
 docker compose up --build
 ```
 
-It takes a while for the the training to complete, 10 minutes or so. During,
+It takes a while for the training to complete, 10 minutes or so. During,
 training, and when the training is complete, episodes are periodically rendered
 to the `data/` directory as animated GIFs.
 
@@ -60,7 +60,7 @@ utilized.
 The agent runs one full episode at a time. At each step, the environment state
 $s_t$ is given to the Actor and Critic, respectively yielding an action
 probability distribution prediction, and a predicted value $V$ of the state ($V$
-is a predition of $G$, which, again, will be described below). An action is
+is a prediction of $G$, which, again, will be described below). An action is
 chosen from the Actor's predictions using `tensorflowf.random.categorical`. This
 random categorical choice _mostly_ follows the Actor's policy,
 $a_t = argmax(\pi[s_t])$, but allows for some exploration.
@@ -101,7 +101,7 @@ $$l_{critic} = huber(G,V)$$
 
 The Actor loss is more complicated. First an
 [_advantage_](https://spinningup.openai.com/en/latest/spinningup/rl_intro.html#advantage-functions)
-is calclated. It's the actual returns $G$ less the predicted values $V$, a
+is calculated. It's the actual returns $G$ less the predicted values $V$, a
 measure of how much _better_ or _worse_ the selected action $a_t$ from state
 $s_t$ was than predicted, if policy $\pi$ were followed after that action.
 
@@ -112,8 +112,9 @@ have a mean of 0 and a standard deviation of 1. Since the Critic predicts these
 rewards, $V$ is _typically_ in this range as well, at least as training
 progresses.
 
-$A$ is multiplied by the natural log of the probabilies provided by the Actor,
-i.e. the policy $\pi$, and negated. Note that the probability predictions form a
+$A$ is multiplied by the natural log of the action probabilities provided by the
+Actor, i.e. the policy $\pi$, and negated. Note that the probability predictions
+form a
 [probability distribution](https://en.wikipedia.org/wiki/Probability_distribution)
 that sums to 1.
 
@@ -130,7 +131,20 @@ $$l_{actor} = -\sum_{t=1}^Tln[\pi(a_t|s_t)] * [G(s_t,a_t)-V(s_t)]$$
 When the advantage $A$ is near 0, meaning that the value predictions are
 accurate, the policy doesn't change much. Conversely, if $A$ is large, the
 probability predictions that are near 0 have a steep gradient, and those near 1
-have a relatively gradual gradient.
+have a relatively gradual gradient. In lay terms:
+
+* If a value prediction for a state $s$ is too high, a bad action was likely
+chosen. E.g. the Critic predicted a normalized return value ($v$) of 0.75, but
+the actual normalized return ($g$) was 0.05: the advantage ($a$) is negative
+(-0.7). Subsequently, all of the action probabilities for $\pi(s)$ will be
+increased, and those nearest 0 will be increased the most because they will have
+the steepest gradients. Next time state $s$ is encountered, the Actor will be
+more likely to choose a different action.
+* Conversely, if a value prediction is too low, the return was higher than
+expected: the policy was better than expected, and the advantage is positive.
+All action probabilities will be reduced, but those nearest 0 will be reduced
+the most. Next time state $s$ comes along, the Actor will be even more likely to
+pick the same action.
 
 #### Total Loss
 
