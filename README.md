@@ -15,7 +15,7 @@ should be installed.
 docker compose up --build
 ```
 
-It takes a while for the training to complete, 10 minutes or so. During,
+It takes a while for the training to complete, 10 minutes or so. During
 training, and when the training is complete, episodes are periodically rendered
 to the `data/` directory as animated GIFs.
 
@@ -61,7 +61,7 @@ The agent runs one full episode at a time. At each step, the environment state
 $s_t$ is given to the Actor and Critic, respectively yielding an action
 probability distribution prediction, and a predicted value $V$ of the state ($V$
 is a prediction of $G$, which, again, will be described below). An action is
-chosen from the Actor's predictions using `tensorflowf.random.categorical`. This
+chosen from the Actor's predictions using `tensorflow.random.categorical`. This
 random categorical choice _mostly_ follows the Actor's policy,
 $a_t = argmax(\pi[s_t])$, but allows for some exploration.
 
