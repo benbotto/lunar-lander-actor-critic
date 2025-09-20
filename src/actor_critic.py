@@ -39,18 +39,20 @@ class ActorCritic(tf.keras.Model):
   them together.
 
   For the Actor loss, the Advantage is calculated.  It's the standardized
-  returns less the values from the Critic, G(s_t,a_t) - V(s_t), which describes
-  how much better it is to take an action from a given state than taking a
-  random action.  More detail can be found, here:
+  returns less the values from the Critic, G(s_t,a_t) - V(s_t), a measure of how
+  much better or worse the selected action a_t from state s_t was than
+  predicted, if policy π were followed after that action.  More detail can be
+  found, here:
   https://spinningup.openai.com/en/latest/spinningup/rl_intro.html#advantage-functions
   The Actor loss is then the log of the action probabilities multiplied by the
   advantange, summed:
 
   L_actor = -Σ(log[π(a_t|s_t)] * [G(s_t,a_t) - V(s_t)])
 
-  Since the Actor and Critic losses are combined, the Actor loss is made
-  negative. This maximizes the probabilities of choosing the actions with the
-  highest rewards by minimizing combined loss.
+  When the advantage $A$ is near 0, meaning that the value predictions are
+  accurate, the policy doesn't change much. Conversely, if A is large, the
+  probability predictions that are near 0 have a steep gradient, and those near
+  1 have a relatively gradual gradient.
 
   More detail can be found in this lenghty lecture (the timestamp shows the
   formula): https://www.youtube.com/watch?v=EKqxumCuAAY&t=3743s
